@@ -17,6 +17,7 @@ void print_list(node *HEAD)
     pthread_mutex_lock(&mutex);
     if(HEAD == NULL) {
         printf("The list is empty\n");
+        pthread_mutex_unlock(&mutex);
         return;
     }
 
