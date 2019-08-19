@@ -3,111 +3,76 @@
 
 #include "list.h"
 
+#define NUM_THREADS 3
+
 node *HEAD = NULL;
 
-pthread_mutex_t mutex;
+pthread_barrier_t barrier;
 
-void *thread1()
+void *thread_routine(void *arg)
 {
-    pthread_mutex_lock(&mutex);
-    printf("Thread1: insert 2\n");
-    HEAD = insert(HEAD, 2);
-    pthread_mutex_unlock(&mutex);
+    int thread_id = (int) arg;
     
-    pthread_mutex_lock(&mutex);
-    printf("Thread1: insert 4\n");
-    HEAD = insert(HEAD, 4);
-    pthread_mutex_unlock(&mutex);
+    pthread_barrier_wait(&barrier);
     
-    pthread_mutex_lock(&mutex);
-    printf("Thread1: insert 10\n");
-    HEAD = insert(HEAD, 10);
-    pthread_mutex_unlock(&mutex);
-    
-    pthread_mutex_lock(&mutex);
-    printf("Thread1: delete 2\n");
-    HEAD = delete(HEAD, 2);
-    pthread_mutex_unlock(&mutex);
-    
-    pthread_mutex_lock(&mutex);
-    printf("Thread1: sort list\n");
-    HEAD = sort_list(HEAD);
-    pthread_mutex_unlock(&mutex);
-    
-    pthread_mutex_lock(&mutex);
-    printf("Thread1: delete 10\n");
-    HEAD = delete(HEAD, 10);
-    pthread_mutex_unlock(&mutex);
-    
-    pthread_mutex_lock(&mutex);
-    printf("Thread1: delete 5\n");
-    HEAD = delete(HEAD, 5);
-    pthread_mutex_unlock(&mutex);
-    
-    return NULL;
-}
-
-void *thread2()
-{
-    pthread_mutex_lock(&mutex);
-    printf("Thread2: insert 11\n");
-    HEAD = insert(HEAD, 11);
-    pthread_mutex_unlock(&mutex);
-    
-    pthread_mutex_lock(&mutex);
-    printf("Thread2: insert 1\n");
-    HEAD = insert(HEAD, 1);
-    pthread_mutex_unlock(&mutex);
-    
-    pthread_mutex_lock(&mutex);
-    printf("Thread2: delete 11\n");
-    HEAD = delete(HEAD, 11);
-    pthread_mutex_unlock(&mutex);
-    
-    pthread_mutex_lock(&mutex);
-    printf("Thread2: insert 8\n");
-    HEAD = insert(HEAD, 8);
-    pthread_mutex_unlock(&mutex);
-    
-    pthread_mutex_lock(&mutex);
-    printf("Thread2: print list\n");
-    print_list(HEAD);
-    pthread_mutex_unlock(&mutex);
-    
-    return NULL;
-}
-
-void *thread3()
-{
-    pthread_mutex_lock(&mutex);
-    printf("Thread3: insert 30\n");
-    HEAD = insert(HEAD, 30);
-    pthread_mutex_unlock(&mutex);
-    
-    pthread_mutex_lock(&mutex);
-    printf("Thread3: insert 25\n");
-    HEAD = insert(HEAD, 25);
-    pthread_mutex_unlock(&mutex);
-    
-    pthread_mutex_lock(&mutex);
-    printf("Thread3: insert 100\n");
-    HEAD = insert(HEAD, 100);
-    pthread_mutex_unlock(&mutex);
-    
-    pthread_mutex_lock(&mutex);
-    printf("Thread3: sort list\n");
-    HEAD = sort_list(HEAD);
-    pthread_mutex_unlock(&mutex);
-    
-    pthread_mutex_lock(&mutex);
-    printf("Thread3: print list\n");
-    print_list(HEAD);
-    pthread_mutex_unlock(&mutex);
-    
-    pthread_mutex_lock(&mutex);
-    printf("Thread3: delete 100\n");
-    HEAD = delete(HEAD, 100);
-    pthread_mutex_unlock(&mutex);
+    //each thread does different things
+    if (thread_id == 1) {
+        printf("Thread1: insert 2\n");
+        HEAD = insert(HEAD, 2);
+            
+        printf("Thread1: insert 4\n");
+        HEAD = insert(HEAD, 4);
+        
+        printf("Thread1: insert 10\n");
+        HEAD = insert(HEAD, 10);
+        
+        printf("Thread1: delete 2\n");
+        HEAD = delete(HEAD, 2);
+        
+        printf("Thread1: sort list\n");
+        HEAD = sort_list(HEAD);
+        
+        printf("Thread1: delete 10\n");
+        HEAD = delete(HEAD, 10);
+        
+        printf("Thread1: delete 5\n");
+        HEAD = delete(HEAD, 5);
+    }   
+    else if (thread_id == 2) {
+        printf("Thread2: insert 11\n");
+        HEAD = insert(HEAD, 11);
+        
+        printf("Thread2: insert 1\n");
+        HEAD = insert(HEAD, 1);
+        
+        printf("Thread2: delete 11\n");
+        HEAD = delete(HEAD, 11);
+        
+        printf("Thread2: insert 8\n");
+        HEAD = insert(HEAD, 8);
+        
+        printf("Thread2: print list\n");
+        print_list(HEAD);
+    }  
+    else {
+        printf("Thread3: insert 30\n");
+        HEAD = insert(HEAD, 30);
+        
+        printf("Thread3: insert 25\n");
+        HEAD = insert(HEAD, 25);
+        
+        printf("Thread3: insert 100\n");
+        HEAD = insert(HEAD, 100);
+        
+        printf("Thread3: sort list\n");
+        HEAD = sort_list(HEAD);
+        
+        printf("Thread3: print list\n");
+        print_list(HEAD);
+        
+        printf("Thread3: delete 100\n");
+        HEAD = delete(HEAD, 100);
+    }
     
     return NULL;
 }
@@ -115,18 +80,24 @@ void *thread3()
 int main(void)
 {
     pthread_t thread_ids[3];
+    pthread_barrier_init(&barrier, NULL, NUM_THREADS);
     
-    pthread_create(&thread_ids[0], NULL, thread1, NULL);
-    pthread_create(&thread_ids[1], NULL, thread2, NULL);
-    pthread_create(&thread_ids[2], NULL, thread3, NULL);
+    //create threads
+    for (int i = 0; i < NUM_THREADS; i++) {
+        pthread_create(&thread_ids[i], NULL, thread_routine, (void *) i);
+    }
     
-    for (int i = 0; i < 3; i++)
+    //wait for threads to end
+    for (int i = 0; i < NUM_THREADS; i++)
         pthread_join(thread_ids[i], NULL);
 
+    //print the list and free the memory
     printf("\nThe list after threads end\n");
     print_list(HEAD);
     flush_list(&HEAD);
     print_list(HEAD);
+    
+    pthread_barrier_destroy(&barrier);
     
     return 0;
 }

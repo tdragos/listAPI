@@ -9,12 +9,16 @@ typedef struct node {
 
 void print_list(node *HEAD);
 
+//insert node at the end of the list
 node * insert(node *HEAD, int value);
 
+//delete the node with the given value
 node * delete(node *HEAD, int value);
 
+//sort the list
 node * sort_list(node *HEAD);
 
+//emmpty the list
 void flush_list(node **HEAD);
 
 #endif /* NODE_MODULE */
