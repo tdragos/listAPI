@@ -19,7 +19,7 @@ void print_list(node *HEAD)
         printf("The list is empty\n");
         return;
     }
-    
+
     node *aux = HEAD;
     while(aux != NULL) {
         (*aux->callback_print)(aux);
@@ -38,18 +38,18 @@ node * insert(node *HEAD, int value)
     tmp->value = value;
     tmp->callback_print = &print_node;
     tmp->next = NULL;
-    
+
     if (HEAD == NULL) {
         HEAD = tmp;
         pthread_mutex_unlock(&mutex);
         return HEAD;
     }
-    
+
     node *aux = HEAD;
     while (aux->next != NULL)
         aux = aux->next;
     aux->next = tmp;
-    
+
     pthread_mutex_unlock(&mutex);
     return HEAD;
 }
@@ -57,36 +57,35 @@ node * insert(node *HEAD, int value)
 //keep a pointer to the node before the one we will
 //delete and link it to the next one
 node * delete(node *HEAD, int value)
-{   
+{
     pthread_mutex_lock(&mutex);
     if (HEAD == NULL) {
         pthread_mutex_unlock(&mutex);
         return HEAD;
     }
-    
+
     node *aux = HEAD;
     node *prev = HEAD;
-    
+
     while (aux != NULL && aux->value != value) {
         prev = aux;
         aux = aux->next;
     }
-    
+
     if (aux == HEAD) {
         prev = aux->next;
         free(aux);
         pthread_mutex_unlock(&mutex);
         return prev;
     }
-    
+
     if (aux != NULL) {
         prev->next = aux->next;
         free(aux);
-        
         pthread_mutex_unlock(&mutex);
         return HEAD;
     }
-    
+
     pthread_mutex_unlock(&mutex);
     return HEAD;
 }
@@ -98,7 +97,7 @@ node * sort_list(node *HEAD)
     pthread_mutex_lock(&mutex);
     node *itr1 = HEAD;
     node *itr2;
-    
+
     while (itr1 != NULL) {
         itr2 = itr1->next;
         while (itr2 != NULL) {
@@ -112,7 +111,7 @@ node * sort_list(node *HEAD)
         }
         itr1 = itr1->next;
     }
-    
+
     pthread_mutex_unlock(&mutex);
     return HEAD;
 }
@@ -123,13 +122,13 @@ void flush_list(node **HEAD)
     pthread_mutex_lock(&mutex);
     node *aux = *HEAD;
     node *prev = *HEAD;
-    
+
     while (aux) {
         prev = aux;
         aux = aux->next;
         free(prev);
     }
-    
+
     *HEAD = NULL;
     pthread_mutex_unlock(&mutex);
 }
