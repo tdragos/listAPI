@@ -11,7 +11,11 @@ void print_node(node *NODE)
     printf("%d ", NODE->value);
 }
 
-//visit each node and call the callback print
+/**
+ * print the list by visiting all nodes and call the
+ * callback print stored in each node
+ * input: the first node of the list
+ */
 void print_list(node *HEAD)
 {
     pthread_mutex_lock(&mutex);
@@ -23,6 +27,7 @@ void print_list(node *HEAD)
 
     node *aux = HEAD;
     while(aux != NULL) {
+        //call the callback print function
         (*aux->callback_print)(aux);
         aux = aux->next;
     }
@@ -30,7 +35,12 @@ void print_list(node *HEAD)
     pthread_mutex_unlock(&mutex);
 }
 
-//go to the end node and link it with the new one
+/**
+ * insert a node at the end of the list. We go to
+ * the last node and link it with the new one
+ * input: the first node of the list and the value
+ *        for the new node
+ */
 void insert(node **HEAD, int value)
 {
     pthread_mutex_lock(&mutex);
@@ -55,8 +65,14 @@ void insert(node **HEAD, int value)
     return;
 }
 
-//keep a pointer to the node before the one we will
-//delete and link it to the next one
+/**
+ * delete the node with the given value from the list.
+ * We keep the node before the one that will be deleted
+ * and we link it to the one after the node that will
+ * be deleted.
+ * input: the first node of the list and the value of
+ *        the node that will be deleted
+ */
 void delete(node **HEAD, int value)
 {
     pthread_mutex_lock(&mutex);
@@ -73,9 +89,10 @@ void delete(node **HEAD, int value)
         aux = aux->next;
     }
 
+    //check if we have to delete the first node
     if (aux == *HEAD) {
         prev = aux->next;
-        free(aux);        
+        free(aux);
         *HEAD = prev;
         pthread_mutex_unlock(&mutex);
         return;
@@ -92,8 +109,12 @@ void delete(node **HEAD, int value)
     return;
 }
 
-//we sort the list by changing the values, not by
-//changing the pointers
+/**
+ * function that sorts the list in O(n^2). We sort the
+ * list by changing the values of the nodes, not by
+ * swapping the nodes.
+ * input: the first node of the list
+ */
 void sort_list(node **HEAD)
 {
     pthread_mutex_lock(&mutex);
@@ -118,7 +139,10 @@ void sort_list(node **HEAD)
     return;
 }
 
-//free the memory for each node
+/**
+ * free the memory for each node in our list
+ * input: the first node of the list
+ */
 void flush_list(node **HEAD)
 {
     pthread_mutex_lock(&mutex);
