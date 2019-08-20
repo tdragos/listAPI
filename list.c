@@ -31,7 +31,7 @@ void print_list(node *HEAD)
 }
 
 //go to the end node and link it with the new one
-node * insert(node *HEAD, int value)
+void insert(node **HEAD, int value)
 {
     pthread_mutex_lock(&mutex);
     node *tmp = NULL;
@@ -40,63 +40,64 @@ node * insert(node *HEAD, int value)
     tmp->callback_print = &print_node;
     tmp->next = NULL;
 
-    if (HEAD == NULL) {
-        HEAD = tmp;
+    if (*HEAD == NULL) {
+        *HEAD = tmp;
         pthread_mutex_unlock(&mutex);
-        return HEAD;
+        return;
     }
 
-    node *aux = HEAD;
+    node *aux = *HEAD;
     while (aux->next != NULL)
         aux = aux->next;
     aux->next = tmp;
 
     pthread_mutex_unlock(&mutex);
-    return HEAD;
+    return;
 }
 
 //keep a pointer to the node before the one we will
 //delete and link it to the next one
-node * delete(node *HEAD, int value)
+void delete(node **HEAD, int value)
 {
     pthread_mutex_lock(&mutex);
-    if (HEAD == NULL) {
+    if (*HEAD == NULL) {
         pthread_mutex_unlock(&mutex);
-        return HEAD;
+        return;
     }
 
-    node *aux = HEAD;
-    node *prev = HEAD;
+    node *aux = *HEAD;
+    node *prev = *HEAD;
 
     while (aux != NULL && aux->value != value) {
         prev = aux;
         aux = aux->next;
     }
 
-    if (aux == HEAD) {
+    if (aux == *HEAD) {
         prev = aux->next;
-        free(aux);
+        free(aux);        
+        *HEAD = prev;
         pthread_mutex_unlock(&mutex);
-        return prev;
+        return;
     }
 
     if (aux != NULL) {
         prev->next = aux->next;
         free(aux);
         pthread_mutex_unlock(&mutex);
-        return HEAD;
+        return;
     }
 
     pthread_mutex_unlock(&mutex);
-    return HEAD;
+    return;
 }
 
 //we sort the list by changing the values, not by
 //changing the pointers
-node * sort_list(node *HEAD)
+void sort_list(node **HEAD)
 {
     pthread_mutex_lock(&mutex);
-    node *itr1 = HEAD;
+    node *itr1 = *HEAD;
     node *itr2;
 
     while (itr1 != NULL) {
@@ -114,7 +115,7 @@ node * sort_list(node *HEAD)
     }
 
     pthread_mutex_unlock(&mutex);
-    return HEAD;
+    return;
 }
 
 //free the memory for each node

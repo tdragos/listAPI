@@ -18,60 +18,60 @@ void *thread_routine(void *arg)
     //each thread does different things
     if (thread_id == 1) {
         printf("Thread1: insert 2\n");
-        HEAD = insert(HEAD, 2);
+        insert(&HEAD, 2);
 
         printf("Thread1: insert 4\n");
-        HEAD = insert(HEAD, 4);
+        insert(&HEAD, 4);
 
         printf("Thread1: insert 10\n");
-        HEAD = insert(HEAD, 10);
+        insert(&HEAD, 10);
 
         printf("Thread1: delete 2\n");
-        HEAD = delete(HEAD, 2);
+        delete(&HEAD, 2);
 
         printf("Thread1: sort list\n");
-        HEAD = sort_list(HEAD);
+        sort_list(&HEAD);
 
         printf("Thread1: delete 10\n");
-        HEAD = delete(HEAD, 10);
+        delete(&HEAD, 10);
 
         printf("Thread1: delete 5\n");
-        HEAD = delete(HEAD, 5);
+        delete(&HEAD, 5);
     }
     else if (thread_id == 2) {
         printf("Thread2: insert 11\n");
-        HEAD = insert(HEAD, 11);
+        insert(&HEAD, 11);
 
         printf("Thread2: insert 1\n");
-        HEAD = insert(HEAD, 1);
+        insert(&HEAD, 1);
 
         printf("Thread2: delete 11\n");
-        HEAD = delete(HEAD, 11);
+        delete(&HEAD, 11);
 
         printf("Thread2: insert 8\n");
-        HEAD = insert(HEAD, 8);
+        insert(&HEAD, 8);
 
         printf("Thread2: print list\n");
         print_list(HEAD);
     }
     else {
         printf("Thread3: insert 30\n");
-        HEAD = insert(HEAD, 30);
+        insert(&HEAD, 30);
 
         printf("Thread3: insert 25\n");
-        HEAD = insert(HEAD, 25);
+        insert(&HEAD, 25);
 
         printf("Thread3: insert 100\n");
-        HEAD = insert(HEAD, 100);
+        insert(&HEAD, 100);
 
         printf("Thread3: sort list\n");
-        HEAD = sort_list(HEAD);
+        sort_list(&HEAD);
 
         printf("Thread3: print list\n");
         print_list(HEAD);
 
         printf("Thread3: delete 100\n");
-        HEAD = delete(HEAD, 100);
+        delete(&HEAD, 100);
     }
 
     return NULL;
